@@ -1,2 +1,1 @@
-# javiermolinar
-AnagramSolver
+# Just another anagram solver
