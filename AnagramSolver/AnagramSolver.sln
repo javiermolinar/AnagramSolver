@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnagramSolver", "AnagramSolver.csproj", "{48269851-5628-4D5D-87C6-6E953185F6CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnagramSolver.Tests", "..\AnagramSolver.Tests\AnagramSolver.Tests.csproj", "{4270D443-DA21-4F92-B871-21672787A42A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{48269851-5628-4D5D-87C6-6E953185F6CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48269851-5628-4D5D-87C6-6E953185F6CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48269851-5628-4D5D-87C6-6E953185F6CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4270D443-DA21-4F92-B871-21672787A42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4270D443-DA21-4F92-B871-21672787A42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4270D443-DA21-4F92-B871-21672787A42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4270D443-DA21-4F92-B871-21672787A42A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
