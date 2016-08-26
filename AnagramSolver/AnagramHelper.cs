@@ -14,59 +14,58 @@ namespace AnagramSolver
 
             return anagramsPermutation;
         }
-        internal static Dictionary<char, byte> GetAllCharOcurrences(string word)
+        internal static Dictionary<char, byte> GetAllCharacterOcurrences(string word)
         {
-            //Calculate for each character the number of ocurrences on the given string
             return word.GroupBy(c => c).OrderBy(c => c.Key).ToDictionary(group => group.Key, group => Convert.ToByte(group.Count()));
         }
 
         //We need to check all possible combinations, it's time consuming, the backtraking help but not too much since we have to
-        //get to low on the tree to realize that we cannot form that anagram. There are a better way to prune?
-        private static void GetAnagrams(Dictionary<char, byte> phraseIndex, Stack<string> chosen,
+        //get to low on the tree to realize that we cannot form that anagram. Also we are taking solutions that was already dropped.
+        private static void GetAnagrams(Dictionary<char, byte> phraseIndex, Stack<string> wordStack,
             Dictionary<string, Dictionary<char, byte>> compatibleWords, HashSet<string> anagrams)
         {
-            if (WordLengh(phraseIndex) != 0)
+            //Do not take again those words which are already on the stack
+            foreach (var anagram in compatibleWords
+                .Where(p => wordStack.ToList().All(p2 => p.Key != p2) && SourceWordContainsTargetWord(phraseIndex, p.Value)))
             {
-                //Do not take again those words which are already on the stack
-                var possibleOptions = compatibleWords.Where(p => chosen.ToList().All(p2 => p.Key != p2));
-                foreach (var anagram in possibleOptions)
+                wordStack.Push(anagram.Key);
+                //We need to substract letters to see if we have already use all the letters, that will mean a successful anagram
+                SubstractLetters(phraseIndex, anagram.Value);
+                var phraseLenght = NumberOfCharacters(phraseIndex);
+
+                //We only add the new anagram to the set when all it's letters have been used
+                if (phraseLenght == 0)
                 {
-                    //There is no point on keeping searching if the phraseIndex's lenght is less than 3
-                    if (WordLengh(phraseIndex) < 3 || !SourceWordContainsTargetWord(phraseIndex, anagram.Value))
-                    {
-                        continue;
-                    }
-
-                    chosen.Push(anagram.Key);
-                    SubstractWords(phraseIndex, anagram.Value);
-                    GetAnagrams(phraseIndex, chosen, compatibleWords, anagrams);
-                    AddWords(phraseIndex, anagram.Value);
-                    chosen.Pop();
+                    AddAnagram(wordStack.ToArray(), anagrams);
                 }
+                //There is no point in keep looking when the wordLengh is < 3 due the exercise restriction
+                else if (phraseLenght >= 3)
+                {
+                    GetAnagrams(phraseIndex, wordStack, compatibleWords, anagrams);
+                }
+                //We need to recover the previous state
+                AddLetters(phraseIndex, anagram.Value);
+                //Since it's not a valid branch anymore we need to extrac it from the stack
+                wordStack.Pop();
             }
-            else
-            {
-                AddAnagram(chosen.ToArray(), anagrams);
-            }
-        }
 
-        //We added the string to the HashSet, since same strings will have same hash repeated ones are not going to be inserted.
+        }
+      
         private static void AddAnagram(string[] anagramArray, HashSet<string> anagrams)
         {
-            //We first sort alphabetically
             Array.Sort(anagramArray);
             var finalstring = string.Join(" ", anagramArray);
             anagrams.Add(finalstring);
         }
 
-        //O(N), we need to traverse the whole list of words and check for each one if are contained inside the given phrase
+        //O(N)
         private static Dictionary<string, Dictionary<char, byte>> GetEveryCompatibleWord(IEnumerable<string> wordlist, IReadOnlyDictionary<char, byte> phraseDictionary)
         {
             var wordsAnagram = new Dictionary<string, Dictionary<char, byte>>();
 
             foreach (var word in wordlist)
             {
-                var wordDictionary = GetAllCharOcurrences(word);
+                var wordDictionary = GetAllCharacterOcurrences(word);
                 if (SourceWordContainsTargetWord(phraseDictionary, wordDictionary))
                 {
                     wordsAnagram.Add(word, wordDictionary);
@@ -75,11 +74,11 @@ namespace AnagramSolver
             return wordsAnagram;
         }
 
-        //How to know if a word contains another word
-        private static bool SourceWordContainsTargetWord(IReadOnlyDictionary<char, byte> sourceWord, Dictionary<char, byte> targetWord)
+      
+        private static bool SourceWordContainsTargetWord(IReadOnlyDictionary<char, byte> sourceWord, IReadOnlyDictionary<char, byte> targetWord)
         {
-            //First we check if the target word is bigger.
-            if (targetWord.Count > sourceWord.Count)
+            //Look that the target is not bigger than the original
+            if (NumberOfCharacters(targetWord) > NumberOfCharacters(sourceWord))
             {
                 return false;
             }
@@ -96,12 +95,12 @@ namespace AnagramSolver
             return true;
         }
 
-        private static int WordLengh(Dictionary<char, byte> phraseDictionary)
+        private static int NumberOfCharacters(IReadOnlyDictionary<char, byte> phraseDictionary)
         {
             return phraseDictionary.Count(character => character.Value > 0);
         }
 
-        private static void AddWords(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
+        private static void AddLetters(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
         {
             foreach (var w in wordDictionary)
             {
@@ -109,7 +108,7 @@ namespace AnagramSolver
             }
         }
 
-        private static void SubstractWords(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
+        private static void SubstractLetters(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
         {
             foreach (var w in wordDictionary)
             {

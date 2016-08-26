@@ -21,7 +21,7 @@ namespace AnagramSolver
             Stopwatch watch = Stopwatch.StartNew();
 
             Regex rgx = new Regex("[^a-z]");
-            HashSet<string> anagrams = AnagramHelper.GetAnagrams(AnagramHelper.GetAllCharOcurrences(rgx.Replace(args[1].ToLower(), "")), wordlist);
+            HashSet<string> anagrams = AnagramHelper.GetAnagrams(AnagramHelper.GetAllCharacterOcurrences(rgx.Replace(args[1].ToLower(), "")), wordlist);
 
             watch.Stop();
 
