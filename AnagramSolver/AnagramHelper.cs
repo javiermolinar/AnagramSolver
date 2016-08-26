@@ -22,39 +22,36 @@ namespace AnagramSolver
 
         //We need to check all possible combinations, it's time consuming, the backtraking help but not too much since we have to
         //get to low on the tree to realize that we cannot form that anagram. There are a better way to prune?
-        //Another problem is try branches already seen. 
-        private static void GetAnagrams(Dictionary<char, byte> phraseIndex, Stack<string> currentWords,
+        private static void GetAnagrams(Dictionary<char, byte> phraseIndex, Stack<string> chosen,
             Dictionary<string, Dictionary<char, byte>> compatibleWords, HashSet<string> anagrams)
         {
-            if (RemainLettersToCompleteAnagram(phraseIndex) != 0)
+            if (WordLengh(phraseIndex) != 0)
             {
                 //Do not take again those words which are already on the stack
-                var possibleOptions = compatibleWords.Where(p => currentWords.ToList().All(p2 => p.Key != p2));
+                var possibleOptions = compatibleWords.Where(p => chosen.ToList().All(p2 => p.Key != p2));
                 foreach (var anagram in possibleOptions)
                 {
                     //There is no point on keeping searching if the phraseIndex's lenght is less than 3
-                    if (RemainLettersToCompleteAnagram(phraseIndex) < 3 || !SourceWordContainsTargetWord(phraseIndex, anagram.Value))
+                    if (WordLengh(phraseIndex) < 3 || !SourceWordContainsTargetWord(phraseIndex, anagram.Value))
                     {
                         continue;
                     }
 
-                    currentWords.Push(anagram.Key);
-                    AddPossibleWordToAnagram(phraseIndex, anagram.Value);
-
-                    GetAnagrams(phraseIndex, currentWords, compatibleWords, anagrams);
-
-                    RemoveFromAnagram(phraseIndex, anagram.Value);
-                    currentWords.Pop();
+                    chosen.Push(anagram.Key);
+                    SubstractWords(phraseIndex, anagram.Value);
+                    GetAnagrams(phraseIndex, chosen, compatibleWords, anagrams);
+                    AddWords(phraseIndex, anagram.Value);
+                    chosen.Pop();
                 }
             }
             else
             {
-                AddCompleteAnagram(currentWords.ToArray(), anagrams);
+                AddAnagram(chosen.ToArray(), anagrams);
             }
         }
 
         //We added the string to the HashSet, since same strings will have same hash repeated ones are not going to be inserted.
-        private static void AddCompleteAnagram(string[] anagramArray, HashSet<string> anagrams)
+        private static void AddAnagram(string[] anagramArray, HashSet<string> anagrams)
         {
             //We first sort alphabetically
             Array.Sort(anagramArray);
@@ -99,24 +96,24 @@ namespace AnagramSolver
             return true;
         }
 
-        private static int RemainLettersToCompleteAnagram(Dictionary<char, byte> phraseDictionary)
+        private static int WordLengh(Dictionary<char, byte> phraseDictionary)
         {
             return phraseDictionary.Count(character => character.Value > 0);
         }
 
-        private static void AddPossibleWordToAnagram(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
+        private static void AddWords(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
         {
-            foreach (var word in wordDictionary)
+            foreach (var w in wordDictionary)
             {
-                phraseDictionary[word.Key] += word.Value;
+                phraseDictionary[w.Key] += w.Value;
             }
         }
 
-        private static void RemoveFromAnagram(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
+        private static void SubstractWords(IDictionary<char, byte> phraseDictionary, Dictionary<char, byte> wordDictionary)
         {
-            foreach (var word in wordDictionary)
+            foreach (var w in wordDictionary)
             {
-                phraseDictionary[word.Key] -= word.Value;
+                phraseDictionary[w.Key] -= w.Value;
             }
         }
     }
