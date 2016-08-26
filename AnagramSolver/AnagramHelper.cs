@@ -21,8 +21,10 @@ namespace AnagramSolver
 
         //We need to check all possible combinations, it's time consuming, the backtraking help but not too much since we have to
         //get to low on the tree to realize that we cannot form that anagram. Also we are taking solutions that was already dropped.
-        private static void GetAnagrams(Dictionary<char, byte> phraseIndex, Stack<string> wordStack,
-            Dictionary<string, Dictionary<char, byte>> compatibleWords, HashSet<string> anagrams)
+        private static void GetAnagrams(Dictionary<char, byte> phraseIndex,
+            Stack<string> wordStack,
+            Dictionary<string, Dictionary<char, byte>> compatibleWords,
+            HashSet<string> anagrams)
         {
             //Do not take again those words which are already on the stack
             foreach (var anagram in compatibleWords
